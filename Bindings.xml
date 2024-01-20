@@ -1,0 +1,5 @@
+<Bindings>
+    <Binding name="ToggleChatNotepad" header="CHATNOTEPAD" key="F3">
+        ToggleFrame()
+    </Binding>
+  </Bindings>

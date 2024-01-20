@@ -1,0 +1,9 @@
+﻿## Author: mayday
+## Interface: 30300
+## Title: |cff00488c[mayday]|r ChatNotepad
+## Version: 1
+## Notes-ruRU: Улучшение для чата.
+## DefaultState: Enabled
+ChatNotepad.lua
+embeds.xml
+Bindings.xml
