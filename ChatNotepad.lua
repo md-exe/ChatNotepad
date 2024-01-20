@@ -98,7 +98,7 @@ local function EditBoxSend()
     UIErrorsFrame:AddMessage("[ChatNotepad]: Сообщение отправлено.", 1.0, 0.1, 0.1, 1.0)
     EditBoxClearFocus()
     TextField.EditBox:SetText("")
-    CloseNotePad()
+    ToggleNotePad()
 end
 
 -- Talk
