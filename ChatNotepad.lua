@@ -169,7 +169,6 @@ TextField.ScrollFrame.EditBox:SetHeight(TextField:GetHeight())
 TextField.ScrollFrame.EditBox:SetPoint('TOPLEFT', 0, 0)
 TextField.ScrollFrame.EditBox:SetPoint('BOTTOMRIGHT', 0, 0)
 
-
 TextField.Background:SetScript("OnMouseDown", function(self)
     TextField.ScrollFrame.EditBox:SetFocus()
 end)
@@ -232,6 +231,10 @@ isTalkText:SetPoint("LEFT", isTalkBtn, "RIGHT", 0, 0)
 isTalkText:SetFont("Fonts\\FRIZQT__.TTF", 15, "OUTLINE")
 isTalkText:SetText("Речь")
 isTalkText:SetJustifyH("LEFT")
+
+isTalkBtn:SetScript("OnClick", function(self)
+    Talk()
+end)
 
 -- Опция точек
 
