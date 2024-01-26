@@ -20,6 +20,9 @@ texture:SetAllPoints(ChatNotepadFrame)
 
 ChatNotepadFrame:Hide()
 
+-- VS commit
+-- 12345
+
 -- Горячие клавиши
 
 _G["BINDING_HEADER_CHATNOTEPAD"] = "ChatNotepad"
