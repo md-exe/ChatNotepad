@@ -85,7 +85,7 @@ local function EditBoxSend()
 
     if (selectedValue == "SAY") then
         SendChatMessage(quotesright, selectedValue)
-        SendChatMessage(".mod st 0")
+        --[[ SendChatMessage(".mod st 0") ]]
     elseif (selectedValue == "EMOTE") then
         SendChatMessage(quotesright, selectedValue)
     elseif (selectedValue == "RAID") then
@@ -116,13 +116,17 @@ end
     end
 end ]]
 
-function Talk()
+--[[ function Talk()
     local selectedValue = ChatNotepadFrameDropDownMenu.selectedValue
     if (selectedValue == "SAY") then
         SendChatMessage(".mod st 1")
     elseif (selectedValue ~= "SAY") then
         SendChatMessage(".mod st 0")
     end
+end ]]
+
+function Talk()
+    SendChatMessage(".mod st 1")
 end
 
 -- Текстовое поле
@@ -188,7 +192,7 @@ end
 
 function CloseNotePad()
     ChatNotepadFrame:Hide()
-    SendChatMessage(".mod st 0")
+    --[[     SendChatMessage(".mod st 0") ]]
 end
 
 -- Точконатор
