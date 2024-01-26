@@ -6,13 +6,38 @@
  @    @. .@  @@  @@   #@%%%%%@      @@      @@      @*   @%%%%%@*     @@       @
  @    @.   @@@   @@  (@      ,@     @@      @@    @@*  .@       @.    @@       @
  
---]] -- Окно ввода
+--]]
+
+-- Основное окно
+
 local ChatNotepadFrame = CreateFrame("Frame", "ChatNotepadFrame", UIParent)
-ChatNotepadFrame:SetSize(600, 415)
+ChatNotepadFrame:SetSize(400, 400)
 ChatNotepadFrame:SetPoint("CENTER", 0, 0)
 ChatNotepadFrame:SetMovable(true)
 ChatNotepadFrame:EnableMouse(true)
 ChatNotepadFrame:SetClampedToScreen(true)
+ChatNotepadFrame:SetResizable(true)
+ChatNotepadFrame:SetMinResize(400, 200)
+--[[ ChatNotepadFrame:SetMaxResize(400, 1000) ]]
+
+local resizeButton = CreateFrame("Button", "ChatNotepadResizeButton", ChatNotepadFrame)
+resizeButton:SetPoint("BOTTOMRIGHT", 0, 0)
+resizeButton:SetSize(16, 16)
+resizeButton:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+resizeButton:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+resizeButton:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+
+resizeButton:SetScript("OnMouseDown", function(self, button)
+    if button == "LeftButton" then
+        ChatNotepadFrame:StartSizing()
+        ChatNotepadFrame:SetUserPlaced(true)
+    end
+end)
+
+resizeButton:SetScript("OnMouseUp", function(self, button)
+    ChatNotepadFrame:StopMovingOrSizing()
+end)
+
 
 local texture = ChatNotepadFrame:CreateTexture(nil, "BACKGROUND")
 texture:SetTexture("Interface/DialogFrame/UI-DialogBox-Background")
@@ -20,23 +45,62 @@ texture:SetAllPoints(ChatNotepadFrame)
 
 ChatNotepadFrame:Hide()
 
--- VS commit
--- 12345
+-- Кнопка отправить
 
--- Горячие клавиши
+local UploadBtn = CreateFrame("BUTTON", "UploadBtn", ChatNotepadFrame, "UIPanelButtonTemplate");
 
-_G["BINDING_HEADER_CHATNOTEPAD"] = "ChatNotepad"
-_G["BINDING_NAME_TOGGLE_CHATNOTEPAD"] = "Toggle ChatNotepad"
+UploadBtn:SetSize(100, 25)
+UploadBtn:SetText("Отправить")
+UploadBtn:SetPoint("BOTTOMRIGHT", ChatNotepadFrame, -10, 10)
+UploadBtn:SetFrameLevel(3)
+UploadBtn:SetScript("OnClick", EditBoxSend)
+
+-- Enter/Отправить
+
+local function EditBoxSend()
+    local TextMessage = TextField.EditBox:GetText()
+    if (TextMessage == "") then
+        print("|cff00488c[ChatNotepad]:|r Введите сообщение.")
+        return
+    end
+
+    local selectedValue = ChatNotepadFrameDropDownMenu.selectedValue
+    local dash = TextMessage:gsub("%-%-", "—")
+    local quotesleft = dash:gsub("%<%<", "«")
+    local quotesright = quotesleft:gsub("%>%>", "»")
+
+    if (isDotBtn:GetChecked()) then
+        if (quotesright:sub(-1) ~= "." and quotesright:sub(-1) ~= "?" and quotesright:sub(-1) ~= "!") then
+            quotesright = quotesright .. "."
+        end
+    end
+
+    if (selectedValue == "SAY") then
+        SendChatMessage(quotesright, selectedValue)
+    elseif (selectedValue == "EMOTE") then
+        SendChatMessage(quotesright, selectedValue)
+    elseif (selectedValue == "RAID") then
+        SendChatMessage(quotesright, selectedValue)
+    elseif (selectedValue == "PARTY") then
+        SendChatMessage(quotesright, selectedValue)
+    elseif (selectedValue == "GUILD") then
+        SendChatMessage(quotesright, selectedValue)
+    end
+    TextField.EditBox:SetText("")
+    CloseNotePad()
+end
+
+
 
 -- Название
 
 local AddonNameTitle = ChatNotepadFrame:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
-AddonNameTitle:SetPoint("CENTER", texture, "CENTER", 0, 190)
+AddonNameTitle:SetPoint("TOPLEFT", ChatNotepadFrame, "TOPLEFT", 10, -10)
 AddonNameTitle:SetFont("Fonts\\FRIZQT__.TTF", 15, "OUTLINE")
 AddonNameTitle:SetWidth(250)
 AddonNameTitle:SetHeight(40)
 AddonNameTitle:SetText("|cffff9716ChatNotepad|r")
-AddonNameTitle:SetJustifyH("CENTER")
+AddonNameTitle:SetJustifyH("LEFT")
 
 -- Кнопка закрытия
 
@@ -66,85 +130,18 @@ local function EditBoxClearFocus()
     CloseNotePad()
 end
 
--- Enter/Отправить
-
-local function EditBoxSend()
-    local TextMessage = TextField.EditBox:GetText()
-    if (TextMessage == "") then
-        print("|cff00488c[ChatNotepad]:|r Введите сообщение.")
-        return
-    end
-
-    local selectedValue = ChatNotepadFrameDropDownMenu.selectedValue
-    local dash = TextMessage:gsub("%-%-", "—")
-    local quotesleft = dash:gsub("%<%<", "«")
-    local quotesright = quotesleft:gsub("%>%>", "»")
-
-    if (isDotBtn:GetChecked()) then
-        if (quotesright:sub(-1) ~= "." and quotesright:sub(-1) ~= "?" and quotesright:sub(-1) ~= "!") then
-            quotesright = quotesright .. "."
-        end
-    end
-
-    if (selectedValue == "SAY") then
-        SendChatMessage(quotesright, selectedValue)
-        --[[ SendChatMessage(".mod st 0") ]]
-    elseif (selectedValue == "EMOTE") then
-        SendChatMessage(quotesright, selectedValue)
-    elseif (selectedValue == "RAID") then
-        SendChatMessage(quotesright, selectedValue)
-    elseif (selectedValue == "PARTY") then
-        SendChatMessage(quotesright, selectedValue)
-    elseif (selectedValue == "GUILD") then
-        SendChatMessage(quotesright, selectedValue)
-    end
-    UIErrorsFrame:AddMessage("[ChatNotepad]: Сообщение отправлено.", 1.0, 0.1, 0.1, 1.0)
-    EditBoxClearFocus()
-    TextField.EditBox:SetText("")
-    CloseNotePad()
-end
-
--- Talk
-
---[[ function Talk()
-    local talkanimation
-    local TextMessage = TextField.EditBox:GetText()
-    local selectedValue = ChatNotepadFrameDropDownMenu.selectedValue
-    if (selectedValue == "SAY" and TextMessage ~= "") then
-        SendChatMessage(".mod st 1")
-        talkanimation = false
-    elseif (selectedValue ~= "SAY") then
-        talkanimation = true
-        SendChatMessage(".mod st 0")
-    end
-end ]]
-
---[[ function Talk()
-    local selectedValue = ChatNotepadFrameDropDownMenu.selectedValue
-    if (selectedValue == "SAY") then
-        SendChatMessage(".mod st 1")
-    elseif (selectedValue ~= "SAY") then
-        SendChatMessage(".mod st 0")
-    end
-end ]]
-
-function Talk()
-    SendChatMessage(".mod st 1")
-end
-
 -- Текстовое поле
 
-TextField = CreateFrame('Frame', 'TextField', ChatNotepadFrame)
-TextField:SetWidth(550)
-TextField:SetHeight(350)
-TextField:SetPoint("CENTER", ChatNotepadFrame, "CENTER", 0, 0)
+local TextField = CreateFrame('Frame', 'TextField', ChatNotepadFrame)
+TextField:SetPoint("TOPLEFT", AddonNameTitle, "BOTTOMLEFT", 10, 0)
+TextField:SetPoint("BOTTOMRIGHT", UploadBtn, "TOPRIGHT", -10, 10)
+TextField:SetPoint("TOP", AddonNameTitle, "BOTTOM", 0, -10)
 TextField:EnableMouseWheel(true)
 
-TextField.Background = CreateFrame('Frame', 'TextField', TextField)
-TextField.Background:SetWidth(550)
-TextField.Background:SetHeight(350)
+TextField.Background = CreateFrame('Frame', 'TextField', ChatNotepadFrame)
 TextField.Background:EnableMouse(true)
-TextField.Background:SetPoint("CENTER", ChatNotepadFrame, "CENTER", 0, 0)
+TextField.Background:SetPoint("TOPLEFT", TextField, -10, 10)
+TextField.Background:SetPoint("BOTTOMRIGHT", TextField, 10, -10)
 TextField.Background:SetBackdrop({
     bgFile = "Interface/DialogFrame/UI-DialogBox-Background",
     edgeFile = "Interface/DialogFrame/UI-DialogBox-Border",
@@ -156,31 +153,54 @@ TextField.Background:SetBackdrop({
         bottom = 5
     }
 })
-TextField.Background:SetMovable(true)
 
 TextField.EditBox = CreateFrame('EditBox', 'TextField.EditBox', TextField)
 TextField.EditBox:SetMultiLine(true)
 TextField.EditBox:SetAutoFocus(true)
 TextField.EditBox:EnableMouse(true)
 TextField.EditBox:SetFont("Fonts\\FRIZQT__.TTF", 15)
-TextField.EditBox:SetWidth(530)
-TextField.EditBox:SetHeight(320)
 TextField.EditBox:EnableMouseWheel(true)
 TextField.EditBox:SetScript("OnEscapePressed", EditBoxClearFocus)
 TextField.EditBox:SetScript("OnEnterPressed", EditBoxSend)
--- TextField.EditBox:SetScript("OnTextChanged", Talk)
+
+-- Баг. Не подхватывает ширину родителя при изменении размеров
+
+--TextField.EditBox:SetWidth(TextField:GetWidth())
+TextField.EditBox:SetResizable(true)
+TextField.EditBox:SetPoint('TOPLEFT', TextField, 'TOPLEFT', 15, 0)
+TextField.EditBox:SetPoint('BOTTOMRIGHT', TextField, 'BOTTOMRIGHT', -30, 0)
+
 
 -- Прокрутка
 
 TextField.ScrollFrame = CreateFrame('ScrollFrame', 'TextField.ScrollFrame', TextField, 'UIPanelScrollFrameTemplate')
-TextField.ScrollFrame:SetPoint('TOPLEFT', ChatNotepadFrame, 'TOPLEFT', 40, -45)
-TextField.ScrollFrame:SetPoint('BOTTOMRIGHT', ChatNotepadFrame, 'BOTTOMRIGHT', -30, 45)
+TextField.ScrollFrame:SetPoint('TOPLEFT', TextField, 'TOPLEFT', 15, -15)
+TextField.ScrollFrame:SetPoint('BOTTOMRIGHT', TextField, 'BOTTOMRIGHT', -30, 10)
 TextField.ScrollFrame:EnableMouseWheel(true)
 TextField.ScrollFrame:SetScrollChild(TextField.EditBox)
 
 TextField.Background:SetScript("OnMouseDown", function(self)
     TextField.EditBox:SetFocus()
 end)
+
+-- Talk
+
+--[[ function Talk()
+    local selectedValue = ChatNotepadFrameDropDownMenu.selectedValue
+    if (selectedValue == "SAY") then
+        SendChatMessage(".mod st 1")
+    elseif (selectedValue ~= "SAY") then
+        SendChatMessage(".mod st 0")
+    end
+end ]]
+
+function Talk()
+    if (isTalkBtn:GetChecked()) then
+        SendChatMessage(".mod st 1")
+    else
+        SendChatMessage(".mod st 0")
+    end
+end
 
 -- Toggler
 
@@ -195,7 +215,7 @@ end
 
 function CloseNotePad()
     ChatNotepadFrame:Hide()
-    --[[     SendChatMessage(".mod st 0") ]]
+    SendChatMessage(".mod st 0")
 end
 
 -- Точконатор
@@ -210,35 +230,29 @@ local function isDotChecker()
     end
 end
 
--- Кнопка отправить
+-- Опция речи
 
-local UploadBtn = CreateFrame("BUTTON", "UploadBtn", ChatNotepadFrame, "UIPanelButtonTemplate");
+local isTalkBtn = CreateFrame("CheckButton", "isTalkBtn", ChatNotepadFrame, "ChatConfigCheckButtonTemplate")
+isTalkBtn:SetPoint("TOPLEFT", TextField.Background, "BOTTOMLEFT")
+isTalkBtn:SetHitRectInsets(5, 5, 5, 5)
 
-UploadBtn:SetSize(100, 25)
-UploadBtn:SetText("Отправить")
-UploadBtn:SetPoint("BOTTOM", ChatNotepadFrame, 225, 5)
-UploadBtn:SetFrameLevel(3)
-UploadBtn:SetScript("OnClick", EditBoxSend)
+local isTalkText = isTalkBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
+isTalkText:SetPoint("LEFT", isTalkBtn, "RIGHT", 0, 0)
+isTalkText:SetFont("Fonts\\FRIZQT__.TTF", 15, "OUTLINE")
+isTalkText:SetText("Речь")
+isTalkText:SetJustifyH("LEFT")
 
 -- Опция точек
 
-local isDotBtn = CreateFrame("CheckButton", "isDotBtn", UploadBtn, "ChatConfigCheckButtonTemplate")
-isDotBtn:SetPoint("TOPLEFT", -450, 0)
-
-isDotBtn:SetScript("OnClick", function(self)
-    if self:GetChecked() then
-        print("|cff00488c[ChatNotepad]:|r Точки в конце поста включены.")
-    else
-        print("|cff00488c[ChatNotepad]:|r Точки в конце поста выключены.")
-    end
-end)
+local isDotBtn = CreateFrame("CheckButton", "isDotBtn", ChatNotepadFrame, "ChatConfigCheckButtonTemplate")
+isDotBtn:SetPoint("LEFT", isTalkText, "RIGHT", 10, 0)
+isDotBtn:SetHitRectInsets(5, 5, 5, 5)
 
 local isDotText = isDotBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
-isDotText:SetPoint("CENTER", UploadBtn, "CENTER", -350, 3)
+isDotText:SetPoint("LEFT", isDotBtn, "RIGHT", 0, 0)
 isDotText:SetFont("Fonts\\FRIZQT__.TTF", 15, "OUTLINE")
-isDotText:SetWidth(250)
 isDotText:SetHeight(40)
-isDotText:SetText("Точки в конце отписи")
+isDotText:SetText("Точки")
 isDotText:SetJustifyH("LEFT")
 
 -- Список
@@ -291,7 +305,7 @@ UIDropDownMenu_SetButtonWidth(ChatNotepadFrameDropDownMenu, 124)
 UIDropDownMenu_JustifyText(ChatNotepadFrameDropDownMenu, "LEFT")
 UIDropDownMenu_SetSelectedID(ChatNotepadFrameDropDownMenu, 1)
 ChatNotepadFrameDropDownMenu.selectedValue = "SAY"
-ChatNotepadFrameDropDownMenu:SetPoint("TOPLEFT", UploadBtn, "TOPLEFT", -150, 0)
+ChatNotepadFrameDropDownMenu:SetPoint("RIGHT", UploadBtn, "LEFT", 0, -2)
 
 -- Мини-карта
 
