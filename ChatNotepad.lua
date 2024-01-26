@@ -6,10 +6,7 @@
  @    @. .@  @@  @@   #@%%%%%@      @@      @@      @*   @%%%%%@*     @@       @
  @    @.   @@@   @@  (@      ,@     @@      @@    @@*  .@       @.    @@       @
  
---]]
-
--- Основное окно
-
+--]] -- Основное окно
 local ChatNotepadFrame = CreateFrame("Frame", "ChatNotepadFrame", UIParent)
 ChatNotepadFrame:SetSize(400, 400)
 ChatNotepadFrame:SetPoint("CENTER", 0, 0)
@@ -17,8 +14,8 @@ ChatNotepadFrame:SetMovable(true)
 ChatNotepadFrame:EnableMouse(true)
 ChatNotepadFrame:SetClampedToScreen(true)
 ChatNotepadFrame:SetResizable(true)
-ChatNotepadFrame:SetMinResize(400, 200)
---[[ ChatNotepadFrame:SetMaxResize(400, 1000) ]]
+ChatNotepadFrame:SetMinResize(300, 300)
+ChatNotepadFrame:SetMaxResize(1366, 768)
 
 local resizeButton = CreateFrame("Button", "ChatNotepadResizeButton", ChatNotepadFrame)
 resizeButton:SetPoint("BOTTOMRIGHT", 0, 0)
@@ -37,7 +34,6 @@ end)
 resizeButton:SetScript("OnMouseUp", function(self, button)
     ChatNotepadFrame:StopMovingOrSizing()
 end)
-
 
 local texture = ChatNotepadFrame:CreateTexture(nil, "BACKGROUND")
 texture:SetTexture("Interface/DialogFrame/UI-DialogBox-Background")
@@ -58,7 +54,7 @@ UploadBtn:SetScript("OnClick", EditBoxSend)
 -- Enter/Отправить
 
 local function EditBoxSend()
-    local TextMessage = TextField.EditBox:GetText()
+    local TextMessage = TextField.ScrollFrame.EditBox:GetText()
     if (TextMessage == "") then
         print("|cff00488c[ChatNotepad]:|r Введите сообщение.")
         return
@@ -86,11 +82,9 @@ local function EditBoxSend()
     elseif (selectedValue == "GUILD") then
         SendChatMessage(quotesright, selectedValue)
     end
-    TextField.EditBox:SetText("")
+    TextField.ScrollFrame.EditBox:SetText("")
     CloseNotePad()
 end
-
-
 
 -- Название
 
@@ -125,23 +119,23 @@ end)
 -- ESC
 
 local function EditBoxClearFocus()
-    TextField.EditBox:ClearFocus()
+    TextField.ScrollFrame.EditBox:ClearFocus()
     local selectedValue = ChatNotepadFrameDropDownMenu.selectedValue
     CloseNotePad()
 end
 
 -- Текстовое поле
-
 local TextField = CreateFrame('Frame', 'TextField', ChatNotepadFrame)
 TextField:SetPoint("TOPLEFT", AddonNameTitle, "BOTTOMLEFT", 10, 0)
 TextField:SetPoint("BOTTOMRIGHT", UploadBtn, "TOPRIGHT", -10, 10)
 TextField:SetPoint("TOP", AddonNameTitle, "BOTTOM", 0, -10)
 TextField:EnableMouseWheel(true)
 
-TextField.Background = CreateFrame('Frame', 'TextField', ChatNotepadFrame)
+-- Фон
+TextField.Background = CreateFrame('Frame', 'TextField.Background', TextField)
 TextField.Background:EnableMouse(true)
-TextField.Background:SetPoint("TOPLEFT", TextField, -10, 10)
-TextField.Background:SetPoint("BOTTOMRIGHT", TextField, 10, -10)
+TextField.Background:SetPoint("TOPLEFT", -10, 10)
+TextField.Background:SetPoint("BOTTOMRIGHT", 10, -10)
 TextField.Background:SetBackdrop({
     bgFile = "Interface/DialogFrame/UI-DialogBox-Background",
     edgeFile = "Interface/DialogFrame/UI-DialogBox-Border",
@@ -154,33 +148,30 @@ TextField.Background:SetBackdrop({
     }
 })
 
-TextField.EditBox = CreateFrame('EditBox', 'TextField.EditBox', TextField)
-TextField.EditBox:SetMultiLine(true)
-TextField.EditBox:SetAutoFocus(true)
-TextField.EditBox:EnableMouse(true)
-TextField.EditBox:SetFont("Fonts\\FRIZQT__.TTF", 15)
-TextField.EditBox:EnableMouseWheel(true)
-TextField.EditBox:SetScript("OnEscapePressed", EditBoxClearFocus)
-TextField.EditBox:SetScript("OnEnterPressed", EditBoxSend)
-
--- Баг. Не подхватывает ширину родителя при изменении размеров
-
-TextField.EditBox:SetWidth(TextField:GetWidth())
-TextField.EditBox:SetResizable(true)
-TextField.EditBox:SetPoint('TOPLEFT', TextField, 'TOPLEFT', 15, 0)
-TextField.EditBox:SetPoint('BOTTOMRIGHT', TextField, 'BOTTOMRIGHT', -30, 0)
-
-
 -- Прокрутка
 
 TextField.ScrollFrame = CreateFrame('ScrollFrame', 'TextField.ScrollFrame', TextField, 'UIPanelScrollFrameTemplate')
-TextField.ScrollFrame:SetPoint('TOPLEFT', TextField, 'TOPLEFT', 15, -15)
-TextField.ScrollFrame:SetPoint('BOTTOMRIGHT', TextField, 'BOTTOMRIGHT', -30, 10)
+TextField.ScrollFrame:SetAllPoints(TextField)
 TextField.ScrollFrame:EnableMouseWheel(true)
-TextField.ScrollFrame:SetScrollChild(TextField.EditBox)
+
+-- Редактируемый текст
+TextField.ScrollFrame.EditBox = CreateFrame('EditBox', 'TextField.ScrollFrame.EditBox', TextField.ScrollFrame)
+TextField.ScrollFrame:SetScrollChild(TextField.ScrollFrame.EditBox) -- баг, при перемещении вниз и вверх ломает скролл
+TextField.ScrollFrame.EditBox:SetMultiLine(true)
+TextField.ScrollFrame.EditBox:SetAutoFocus(true)
+TextField.ScrollFrame.EditBox:EnableMouse(true)
+TextField.ScrollFrame.EditBox:SetFont("Fonts\\FRIZQT__.TTF", 15)
+TextField.ScrollFrame.EditBox:EnableMouseWheel(true)
+TextField.ScrollFrame.EditBox:SetScript("OnEscapePressed", EditBoxClearFocus)
+TextField.ScrollFrame.EditBox:SetScript("OnEnterPressed", EditBoxSend)
+TextField.ScrollFrame.EditBox:SetWidth(TextField:GetWidth())
+TextField.ScrollFrame.EditBox:SetHeight(TextField:GetHeight())
+TextField.ScrollFrame.EditBox:SetPoint('TOPLEFT', 0, 0)
+TextField.ScrollFrame.EditBox:SetPoint('BOTTOMRIGHT', 0, 0)
+
 
 TextField.Background:SetScript("OnMouseDown", function(self)
-    TextField.EditBox:SetFocus()
+    TextField.ScrollFrame.EditBox:SetFocus()
 end)
 
 -- Talk
@@ -222,10 +213,10 @@ end
 
 local function isDotChecker()
     if (isDotBtn:GetChecked()) then
-        local text = TextField.EditBox:GetText()
+        local text = TextField.ScrollFrame.EditBox:GetText()
         if (string.sub(text, -1) ~= "." or string.sub(text, -1) ~= "?" or string.sub(text, -1) ~= "!") then
-            TextField.EditBox:SetText(text .. ".")
-            TextField.EditBox:ClearFocus()
+            TextField.ScrollFrame.EditBox:SetText(text .. ".")
+            TextField.ScrollFrame.EditBox:ClearFocus()
         end
     end
 end
