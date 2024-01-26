@@ -21,7 +21,7 @@ texture:SetAllPoints(ChatNotepadFrame)
 ChatNotepadFrame:Hide()
 
 -- VS commit
--- 123
+-- 1234
 
 -- Горячие клавиши
 
