@@ -165,7 +165,7 @@ TextField.EditBox:SetScript("OnEnterPressed", EditBoxSend)
 
 -- Баг. Не подхватывает ширину родителя при изменении размеров
 
---TextField.EditBox:SetWidth(TextField:GetWidth())
+TextField.EditBox:SetWidth(TextField:GetWidth())
 TextField.EditBox:SetResizable(true)
 TextField.EditBox:SetPoint('TOPLEFT', TextField, 'TOPLEFT', 15, 0)
 TextField.EditBox:SetPoint('BOTTOMRIGHT', TextField, 'BOTTOMRIGHT', -30, 0)
