@@ -6,7 +6,7 @@
  @    @. .@  @@  @@   #@%%%%%@      @@      @@      @*   @%%%%%@*     @@       @
  @    @.   @@@   @@  (@      ,@     @@      @@    @@*  .@       @.    @@       @
  
---]] -- Основное окно 123
+--]] -- Основное окно 1234
 local ChatNotepadFrame = CreateFrame("Frame", "ChatNotepadFrame", UIParent)
 ChatNotepadFrame:SetSize(400, 400)
 ChatNotepadFrame:SetPoint("CENTER", 0, 0)
