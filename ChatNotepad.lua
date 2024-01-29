@@ -65,11 +65,10 @@ local function EditBoxSend()
     local quotesleft = dash:gsub("%<%<", "«")
     local quotesright = quotesleft:gsub("%>%>", "»")
 
-    if (isDotBtn:GetChecked()) then
+
         if (quotesright:sub(-1) ~= "." and quotesright:sub(-1) ~= "?" and quotesright:sub(-1) ~= "!") then
             quotesright = quotesright .. "."
         end
-    end
 
     if (selectedValue == "SAY") then
         SendChatMessage(quotesright, selectedValue)
@@ -211,18 +210,18 @@ end
 -- Точконатор
 
 local function isDotChecker()
-    if (isDotBtn:GetChecked()) then
         local text = TextField.ScrollFrame.EditBox:GetText()
         if (string.sub(text, -1) ~= "." or string.sub(text, -1) ~= "?" or string.sub(text, -1) ~= "!") then
             TextField.ScrollFrame.EditBox:SetText(text .. ".")
             TextField.ScrollFrame.EditBox:ClearFocus()
         end
-    end
+
 end
 
 -- Опция речи
 
 local isTalkBtn = CreateFrame("CheckButton", "isTalkBtn", ChatNotepadFrame, "ChatConfigCheckButtonTemplate")
+isTalkBtn:SetChecked()
 isTalkBtn:SetPoint("TOPLEFT", TextField.Background, "BOTTOMLEFT")
 isTalkBtn:SetHitRectInsets(5, 5, 5, 5)
 
@@ -236,18 +235,6 @@ isTalkBtn:SetScript("OnClick", function(self)
     Talk()
 end)
 
--- Опция точек
-
-local isDotBtn = CreateFrame("CheckButton", "isDotBtn", ChatNotepadFrame, "ChatConfigCheckButtonTemplate")
-isDotBtn:SetPoint("LEFT", isTalkText, "RIGHT", 10, 0)
-isDotBtn:SetHitRectInsets(5, 5, 5, 5)
-
-local isDotText = isDotBtn:CreateFontString(nil, "OVERLAY", "GameFontHighlightLarge")
-isDotText:SetPoint("LEFT", isDotBtn, "RIGHT", 0, 0)
-isDotText:SetFont("Fonts\\FRIZQT__.TTF", 15, "OUTLINE")
-isDotText:SetHeight(40)
-isDotText:SetText("Точки")
-isDotText:SetJustifyH("LEFT")
 
 -- Список
 
@@ -349,18 +336,6 @@ ChatNotepadButton:SetScript("OnEnter", function(self)
     GameTooltip:Show();
 end);
 ChatNotepadButton:SetScript("OnLeave", function()
-    GameTooltip:Hide();
-end);
-
--- Текст точконатора
-
-isDotBtn:SetScript("OnEnter", function(self)
-    GameTooltip:SetOwner(self, "ANCHOR_LEFT");
-    GameTooltip:SetText("Добавит точку в конце, если вы её забыли.");
-    GameTooltip:AddLine("Если она есть, то лишнюю аддон не поставит.", 0.9, 1, 0.5);
-    GameTooltip:Show();
-end);
-isDotBtn:SetScript("OnLeave", function()
     GameTooltip:Hide();
 end);
 
