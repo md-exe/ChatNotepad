@@ -1,6 +1,6 @@
-﻿## Author: mayday
+﻿## Author: FG, Mayday
 ## Interface: 30300
-## Title: |cff00488c[mayday]|r ChatNotepad
+## Title: |cffFF0000[FG]|r ChatNotepad
 ## Version: 1
 ## Notes-ruRU: Улучшение для чата.
 ## DefaultState: Enabled
